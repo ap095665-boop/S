@@ -124,37 +124,117 @@
     let isScratching = false;
 
     // Draw Scratch Cover
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scratch Punishment Reveal</title>
+
+<style>
+    body {
+        margin: 0;
+        background: black;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        color: white;
+        flex-direction: column;
+    }
+
+    h2 {
+        color: lime;
+        text-shadow: 0 0 15px lime;
+        margin-bottom: 20px;
+    }
+
+    /* Scratch Card Container */
+    .card-container {
+        position: relative;
+        width: 320px;
+        height: 180px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 0 25px lime;
+        border: 2px solid lime;
+    }
+
+    /* Hidden Punishment Text */
+    .punishment-text {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 255, 0, 0.08);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 22px;
+        font-weight: bold;
+        text-align: center;
+        padding: 15px;
+        z-index: 1;
+        color: lime;
+        text-shadow: 0 0 15px lime;
+    }
+
+    /* Scratch Canvas */
+    canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 2;
+    }
+
+    .status {
+        margin-top: 15px;
+        font-size: 14px;
+        color: gray;
+    }
+</style>
+</head>
+
+<body>
+
+<h2>⚠ SYSTEM SCRATCH REVEAL ⚠</h2>
+
+<div class="card-container">
+    <div class="punishment-text" id="punishmentText">
+        🎤 PUNISHMENT: Sing a song dramatically!
+    </div>
+    <canvas id="scratchCanvas"></canvas>
+</div>
+
+<p class="status" id="statusText">Scratch fully to activate punishment</p>
+
+<script>
+    const canvas = document.getElementById("scratchCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const card = document.querySelector(".card-container");
+    canvas.width = card.offsetWidth;
+    canvas.height = card.offsetHeight;
+
+    let isScratching = false;
+
+    // Draw Scratch Cover
     function coverCard() {
+        ctx.globalCompositeOperation = "source-over";
         ctx.fillStyle = "#222";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Neon Overlay Effect
+        // Neon Overlay Text
         ctx.font = "20px Arial";
         ctx.fillStyle = "lime";
         ctx.textAlign = "center";
         ctx.fillText("SCRATCH HERE", canvas.width / 2, canvas.height / 2);
 
-        ctx.globalCompositeOperation = "source-over";
-    }
-
-    coverCard();
-
-    // Load Custom Punishment
-    function startCard() {
-        let input = document.getElementById("punishmentInput").value.trim();
-
-        if (input === "") {
-            alert("Enter a punishment first!");
-            return;
-        }
-
-        document.getElementById("punishmentText").innerText = input;
-        document.getElementById("punishmentInput").value = "";
-
-        coverCard();
         document.getElementById("statusText").innerText =
             "Scratch fully to activate punishment...";
     }
+
+    coverCard();
 
     // Scratch Effect
     function scratch(x, y) {
@@ -179,7 +259,12 @@
         if (percent > 70) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             document.getElementById("statusText").innerText =
-                "✅ PUNISHMENT ACTIVATED!";
+                "✅ PUNISHMENT ACTIVATED! Resetting in 5 sec...";
+
+            // Auto Reset after 5 seconds
+            setTimeout(() => {
+                coverCard();
+            }, 5000);
         }
     }
 
