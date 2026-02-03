@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scratch Punishment Reveal</title>
+
+<style>
+    body {
+        margin: 0;
+        background: black;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        color: white;
+        flex-direction: column;
+    }
+
+    h2 {
+        color: lime;
+        text-shadow: 0 0 15px lime;
+        margin-bottom: 10px;
+    }
+
+    /* Punishment Input */
+    input {
+        padding: 10px;
+        width: 280px;
+        border-radius: 6px;
+        border: none;
+        outline: none;
+        font-size: 15px;
+        margin-bottom: 10px;
+    }
+
+    button {
+        padding: 10px 25px;
+        border: none;
+        background: lime;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        transition: 0.2s;
+    }
+
+    button:hover {
+        background: white;
+        color: black;
+        transform: scale(1.05);
+    }
+
+    /* Scratch Card Container */
+    .card-container {
+        position: relative;
+        width: 320px;
+        height: 180px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 0 25px lime;
+        border: 2px solid lime;
+    }
+
+    /* Hidden Punishment Text */
+    .punishment-text {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 255, 0, 0.08);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 22px;
+        font-weight: bold;
+        text-align: center;
+        padding: 15px;
+        z-index: 1;
+        color: lime;
+        text-shadow: 0 0 15px lime;
+    }
+
+    /* Scratch Canvas */
+    canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 2;
+    }
+
+    .status {
+        margin-top: 15px;
+        font-size: 14px;
+        color: gray;
+    }
+</style>
+</head>
+
+<body>
+
+<h2>⚠ SYSTEM SCRATCH REVEAL ⚠</h2>
+
+<input id="punishmentInput" placeholder="Enter punishment..." />
+<button onclick="startCard()">LOAD PUNISHMENT</button>
+
+<div class="card-container">
+    <div class="punishment-text" id="punishmentText">
+        Scratch to reveal...
+    </div>
+    <canvas id="scratchCanvas"></canvas>
+</div>
+
+<p class="status" id="statusText">Scratch fully to activate punishment</p>
+
+<script>
+    const canvas = document.getElementById("scratchCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const card = document.querySelector(".card-container");
+    canvas.width = card.offsetWidth;
+    canvas.height = card.offsetHeight;
+
+    let isScratching = false;
+
+    // Draw Scratch Cover
+    function coverCard() {
+        ctx.fillStyle = "#222";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Neon Overlay Effect
+        ctx.font = "20px Arial";
+        ctx.fillStyle = "lime";
+        ctx.textAlign = "center";
+        ctx.fillText("SCRATCH HERE", canvas.width / 2, canvas.height / 2);
+
+        ctx.globalCompositeOperation = "source-over";
+    }
+
+    coverCard();
+
+    // Load Custom Punishment
+    function startCard() {
+        let input = document.getElementById("punishmentInput").value.trim();
+
+        if (input === "") {
+            alert("Enter a punishment first!");
+            return;
+        }
+
+        document.getElementById("punishmentText").innerText = input;
+        document.getElementById("punishmentInput").value = "";
+
+        coverCard();
+        document.getElementById("statusText").innerText =
+            "Scratch fully to activate punishment...";
+    }
+
+    // Scratch Effect
+    function scratch(x, y) {
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.beginPath();
+        ctx.arc(x, y, 18, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Check Scratch Completion %
+    function checkProgress() {
+        let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        let pixels = imageData.data;
+        let transparent = 0;
+
+        for (let i = 3; i < pixels.length; i += 4) {
+            if (pixels[i] === 0) transparent++;
+        }
+
+        let percent = (transparent / (pixels.length / 4)) * 100;
+
+        if (percent > 70) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            document.getElementById("statusText").innerText =
+                "✅ PUNISHMENT ACTIVATED!";
+        }
+    }
+
+    // Mouse Events
+    canvas.addEventListener("mousedown", () => isScratching = true);
+    canvas.addEventListener("mouseup", () => {
+        isScratching = false;
+        checkProgress();
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+        if (!isScratching) return;
+        let rect = canvas.getBoundingClientRect();
+        scratch(e.clientX - rect.left, e.clientY - rect.top);
+    });
+
+    // Touch Events (Mobile)
+    canvas.addEventListener("touchstart", () => isScratching = true);
+    canvas.addEventListener("touchend", () => {
+        isScratching = false;
+        checkProgress();
+    });
+
+    canvas.addEventListener("touchmove", (e) => {
+        e.preventDefault();
+        if (!isScratching) return;
+        let rect = canvas.getBoundingClientRect();
+        let touch = e.touches[0];
+        scratch(touch.clientX - rect.left, touch.clientY - rect.top);
+    });
+</script>
+
+</body>
+</html>
