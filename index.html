@@ -49,7 +49,7 @@
         text-align: center;
         padding: 15px;
         z-index: 1;
-        color: lime;
+        color: red;
         text-shadow: 0 0 15px lime;
     }
 
@@ -75,7 +75,7 @@
 
 <div class="card-container">
     <div class="punishment-text" id="punishmentText">
-        🎤 PUNISHMENT: Sing a song dramatically!
+        Sing a song dramatically!
     </div>
     <canvas id="scratchCanvas"></canvas>
 </div>
@@ -95,7 +95,7 @@
     // Draw Scratch Cover
     function coverCard() {
         ctx.globalCompositeOperation = "source-over";
-        ctx.fillStyle = "#222";
+        ctx.fillStyle = "#000080";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Neon Overlay Text
